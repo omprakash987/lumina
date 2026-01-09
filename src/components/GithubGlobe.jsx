@@ -4,10 +4,10 @@ import * as THREE from "three";
 import land from '../data/WordLand.json'
 import { useMemo, useRef } from "react";
 
-/* ---------- LAT LNG → 3D ---------- */
+/* ------------------ UTIL ------------------ */
 function latLngToVector3(lat, lng, radius) {
-  const phi = (90 - lat) * Math.PI / 180;
-  const theta = (lng + 180) * Math.PI / 180;
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = (lng + 180) * (Math.PI / 180);
 
   return new THREE.Vector3(
     -radius * Math.sin(phi) * Math.cos(theta),
@@ -16,14 +16,15 @@ function latLngToVector3(lat, lng, radius) {
   );
 }
 
-/* ---------- GENERATE CONTINENT DOTS ---------- */
-function useContinentDots(radius) {
+/* ------------------ CONTINENT DOTS ------------------ */
+function useContinentDots(radius, isMobile) {
   return useMemo(() => {
     const dots = [];
+    const step = isMobile ? 6 : 3; // reduce density on mobile
 
     land.features.forEach((feature) => {
-      feature.geometry.coordinates.flat(2).forEach((coord) => {
-        if (coord.length >= 2) {
+      feature.geometry.coordinates.flat(2).forEach((coord, i) => {
+        if (coord.length >= 2 && i % step === 0) {
           const [lng, lat] = coord;
           dots.push(latLngToVector3(lat, lng, radius));
         }
@@ -31,34 +32,54 @@ function useContinentDots(radius) {
     });
 
     return dots;
-  }, [radius]);
+  }, [radius, isMobile]);
 }
 
-/* ---------- CONNECTIONS ---------- */
+/* ------------------ ROUTES ------------------ */
 const routes = [
-  // India → USA
-  [[20.5937, 78.9629], [37.0902, -95.7129]],
-  // UK → Singapore
-  [[55.3781, -3.4360], [1.3521, 103.8198]],
-  // Germany → Brazil
-  [[51.1657, 10.4515], [-14.2350, -51.9253]],
+  [[20.5937, 78.9629], [37.0902, -95.7129]], // India → USA
+  [[55.3781, -3.4360], [1.3521, 103.8198]], // UK → Singapore
+  [[51.1657, 10.4515], [-14.2350, -51.9253]], // Germany → Brazil
 ];
 
-/* ---------- GLOBE ---------- */
-function Globe() {
-  const group = useRef();
-  const radius = 3;
-  const dots = useContinentDots(radius);
+/* ------------------ SPARK ------------------ */
+function Spark({ curve, isMobile }) {
+  const ref = useRef();
+  const t = useRef(Math.random());
 
-  useFrame(({ mouse }) => {
-    if (!group.current) return;
-    group.current.rotation.y += 0.0007;
-    group.current.rotation.x = mouse.y * 0.2;
-    group.current.rotation.y += mouse.x * 0.05;
+  useFrame((_, delta) => {
+    t.current += delta * (isMobile ? 0.08 : 0.15);
+    if (t.current > 1) t.current = 0;
+
+    const pos = curve.getPointAt(t.current);
+    ref.current.position.copy(pos);
   });
 
   return (
-    <group ref={group}>
+    <mesh ref={ref}>
+      <sphereGeometry args={[isMobile ? 0.045 : 0.06, 16, 16]} />
+      <meshBasicMaterial color="#f5e27a" />
+    </mesh>
+  );
+}
+
+/* ------------------ GLOBE ------------------ */
+function Globe() {
+  const groupRef = useRef();
+  const isMobile = window.innerWidth < 768;
+  const radius = isMobile ? 2.6 : 3;
+
+  const dots = useContinentDots(radius, isMobile);
+
+  useFrame(({ mouse }) => {
+    if (!groupRef.current) return;
+    groupRef.current.rotation.y += 0.0007;
+    groupRef.current.rotation.x = mouse.y * 0.2;
+    groupRef.current.rotation.y += mouse.x * 0.05;
+  });
+
+  return (
+    <group ref={groupRef}>
       {/* CONTINENT DOTS */}
       <points>
         <bufferGeometry>
@@ -70,14 +91,14 @@ function Globe() {
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.035}
+          size={isMobile ? 0.025 : 0.035}
           color="#d4af37"
           transparent
           opacity={0.85}
         />
       </points>
 
-      {/* ARC CONNECTIONS + SPARK */}
+      {/* CONNECTION ARCS + SPARKS */}
       {routes.map((r, i) => {
         const start = latLngToVector3(r[0][0], r[0][1], radius);
         const end = latLngToVector3(r[1][0], r[1][1], radius);
@@ -97,9 +118,7 @@ function Globe() {
               transparent
               opacity={0.6}
             />
-
-            {/* SPARK */}
-            <Spark curve={curve} />
+            <Spark curve={curve} isMobile={isMobile} />
           </group>
         );
       })}
@@ -107,33 +126,24 @@ function Globe() {
   );
 }
 
-/* ---------- MOVING SPARK ---------- */
-function Spark({ curve }) {
-  const ref = useRef();
-  const t = useRef(Math.random());
-
-  useFrame((_, delta) => {
-    t.current += delta * 0.15;
-    if (t.current > 1) t.current = 0;
-
-    const pos = curve.getPointAt(t.current);
-    ref.current.position.copy(pos);
-  });
-
-  return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[0.06, 16, 16]} />
-      <meshBasicMaterial color="#f5e27a" />
-    </mesh>
-  );
-}
-
+/* ------------------ CANVAS ------------------ */
 export default function GithubGlobe() {
+  const isMobile = window.innerWidth < 768;
+
   return (
-    <Canvas camera={{ position: [0, 0, 8] }}>
+    <Canvas
+      camera={{
+        position: isMobile ? [0, 0, 9.5] : [0, 0, 8],
+        fov: 45,
+      }}
+    >
       <ambientLight intensity={0.6} />
-      <OrbitControls enableZoom={false} enablePan={false} />
       <Globe />
+      <OrbitControls
+        enableZoom={false}
+        enablePan={false}
+        rotateSpeed={0.6}
+      />
     </Canvas>
   );
 }

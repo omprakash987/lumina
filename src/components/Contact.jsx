@@ -50,9 +50,10 @@ export default function Contact() {
 
         {/* RIGHT — 3D Globe */}
         <Reveal delay={300}>
-          <div className="hidden md:block h-[400px] w-full">
-            <GithubGlobe/>
-          </div>
+       <div className="h-[320px] sm:h-[400px] md:h-[520px] w-full">
+  <GithubGlobe />
+</div>
+
         </Reveal>
 
       </div>
