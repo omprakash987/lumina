@@ -12,19 +12,22 @@ export default function Navbar() {
         block: "start",
       });
     }
-    setOpen(false); // close mobile menu after click
+    setOpen(false); 
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-[#0b0b0f]/80 backdrop-blur-md border-b border-white/10">
-      <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+    
 
-        {/* Logo */}
+    
+    <nav className="fixed top-0 w-full z-50 bg-[#0b0b0f]/80 backdrop-blur-md border-b border-white/10 ">
+      <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4 ">
+
         <h1 className="text-2xl font-semibold tracking-wide text-[#d4af37]">
-          Lumina HR Partners
+         <a href={"#"}>
+           Lumina HR Partners
+         </a>
         </h1>
 
-        {/* Desktop Menu */}
         <div className="hidden md:flex space-x-10 items-center">
           {["about", "services", "contact"].map((item) => (
             <a
@@ -48,7 +51,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Hamburger Icon */}
+      
         <button
           className="md:hidden text-white focus:outline-none"
           onClick={() => setOpen(!open)}
@@ -61,7 +64,6 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {open && (
         <div className="md:hidden bg-[#0b0b0f]/95 backdrop-blur-xl border-t border-white/10">
           <div className="flex flex-col items-center py-8 space-y-6">
@@ -85,5 +87,6 @@ export default function Navbar() {
         </div>
       )}
     </nav>
+   
   );
 }

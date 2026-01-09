@@ -1,3 +1,5 @@
+import Reveal from "./Reveal";
+
 const testimonials = [
   {
     quote:
@@ -21,6 +23,9 @@ const testimonials = [
 
 export default function Testimonials() {
   return (
+    <Reveal>
+
+   
     <section
       className="relative py-28 bg-[#0b0b0f] text-white overflow-hidden"
     >
@@ -73,5 +78,7 @@ export default function Testimonials() {
 
       </div>
     </section>
+
+     </Reveal>
   );
 }

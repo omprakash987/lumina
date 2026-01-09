@@ -1,3 +1,5 @@
+import Reveal from "./Reveal";
+
 const services = [
   "Executive Search & Leadership Hiring",
   "Recruitment & Staffing Solutions",
@@ -8,6 +10,9 @@ const services = [
 
 export default function Services() {
   return (
+   
+
+    
     <section
       id="services"
       className="relative py-28 bg-[#0b0b0f] text-white overflow-hidden"
@@ -15,7 +20,7 @@ export default function Services() {
       <div className="absolute inset-0">
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-[650px] h-[650px] bg-[#d4af37]/10 rounded-full blur-[140px]" />
       </div>
-
+ <Reveal>
       <div className="relative z-10 max-w-6xl mx-auto px-6">
 
         <p className="text-sm uppercase tracking-[0.25em] text-[#d4af37] text-center mb-4 animate-fadeInUp">
@@ -58,7 +63,10 @@ export default function Services() {
             </div>
           ))}
         </div>
+      
       </div>
+        </Reveal>
     </section>
+    
   );
 }

@@ -1,5 +1,10 @@
+import Reveal from "./Reveal";
+
 export default function About() {
   return (
+
+
+
     <section
       id="about"
       className="relative py-28 bg-[#0b0b0f] text-white overflow-hidden"
@@ -8,6 +13,7 @@ export default function About() {
       <div className="absolute inset-0">
         <div className="absolute top-20 right-1/2 w-[500px] h-[500px] bg-[#d4af37]/10 rounded-full blur-[120px]" />
       </div>
+      <Reveal>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
 
@@ -38,6 +44,8 @@ export default function About() {
           </p>
         </div>
       </div>
+      </Reveal>
     </section>
+    
   );
 }
